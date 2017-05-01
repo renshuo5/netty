@@ -9,6 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +29,8 @@ public class HelloServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                                 @Override
                                 public void initChannel(SocketChannel ch) throws Exception {
-                                	ch.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
+                                	ch.pipeline().addLast(new IdleStateHandler(5,0,0));
+                                	ch.pipeline().addLast("readtime",new ReadTimeoutHandler(16));
                                     ch.pipeline().addLast(new HelloServerHandler());
                                 }
                             }).option(ChannelOption.SO_BACKLOG, 128) 

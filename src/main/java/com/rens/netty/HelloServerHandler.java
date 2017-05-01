@@ -27,6 +27,7 @@ public class HelloServerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
+		System.out.println("-------------------channelRead----------------------");
 		ByteBuf buf = (ByteBuf) msg;
 		byte[] req = new byte[buf.readableBytes()];
 
@@ -35,37 +36,11 @@ public class HelloServerHandler extends ChannelInboundHandlerAdapter {
 		String message = new String(req, "UTF-8");
 
 		System.out.println("Netty-Server:Receive Message," + message);
-		System.out
-				.println("-------------------channelRead----------------------");
+		
 	}
 
 	@Override
 	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 		ctx.fireChannelReadComplete();
-	}
-
-	private static final ByteBuf HEARTBEAT_SEQUENCE = Unpooled
-			.unreleasableBuffer(Unpooled.copiedBuffer("Heartbeat",
-					CharsetUtil.UTF_8));
-
-	@Override
-	public void userEventTriggered(ChannelHandlerContext ctx, Object evt)
-			throws Exception {
-		if (evt instanceof IdleStateEvent) { // 2
-			IdleStateEvent event = (IdleStateEvent) evt;
-			String type = "";
-			if (event.state() == IdleState.READER_IDLE) {
-				type = "read idle";
-			} else if (event.state() == IdleState.WRITER_IDLE) {
-				type = "write idle";
-			} else if (event.state() == IdleState.ALL_IDLE) {
-				type = "all idle";
-			}
-			ctx.writeAndFlush(HEARTBEAT_SEQUENCE.duplicate()).addListener(
-					ChannelFutureListener.CLOSE_ON_FAILURE); // 3
-			System.out.println(ctx.channel().remoteAddress() + "超时类型：" + type);
-		} else {
-			super.userEventTriggered(ctx, evt);
-		}
 	}
 }
